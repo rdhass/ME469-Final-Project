@@ -1,6 +1,6 @@
 #!/usr/bin/sh
 
-script=/home/users/ryanhass/ME469_FinalProject/postProcessing/visualize_nalu.py
+script=/home/users/ryanhass/ME469_FinalProject/postProcessing//ME469-Final-Project/visualize_nalu.py
 
 # Install Python packages
 if [ -f $HOME/.local/bin/pip ]
@@ -42,7 +42,7 @@ fi
 
 # Run nalu
 echo "Post process nalu"
-if [ -f ../datFiles/viscousPump.e ]
+if [ -f /home/users/ryanhass/ME469_FinalProject/datFiles/baseline1/viscousPump.e ]
 then
 	echo "Start to generate plot."
 	python3 $script

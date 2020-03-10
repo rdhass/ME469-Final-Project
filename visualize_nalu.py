@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import matplotlib.tri    as tri
 
 def main():
-    nalu_data_dir='/home/users/ryanhass/ME469_FinalProject/datFiles'
+    nalu_data_dir='/home/users/ryanhass/ME469_FinalProject/datFiles/baseline1'
     base_name = 'viscousPump.e'
     filename = nalu_data_dir + '/' + base_name
     dset = nc.Dataset(filename, mode='r')
@@ -22,7 +22,7 @@ def main():
     var4 = np.array(dset.variables['vals_nod_var4'][-1])
     var5 = np.array(dset.variables['vals_nod_var5'][-1])
     var6 = np.array(dset.variables['vals_nod_var6'][-1])
-    var7 = np.array(dset.variables['vals_nod_var7'][-1])
+    p = np.array(dset.variables['vals_nod_var7'][-1])
     u = np.array(dset.variables['vals_nod_var8'][-1])
     v = np.array(dset.variables['vals_nod_var9'][-1])
 
@@ -32,10 +32,27 @@ def main():
     triang.set_mask(np.hypot(xtri, ytri) < 1.0)
     ti_u = tri.LinearTriInterpolator(triang, u)
     ti_v = tri.LinearTriInterpolator(triang, v)
-    _ , uy = ti_u.gradient(triang.x, triang.y)
-    vx, _  = ti_v.gradient(triang.x, triang.y)
-    w = uy - vx
+    dudx , dudy = ti_u.gradient(triang.x, triang.y)
+    dvdx, dvdy  = ti_v.gradient(triang.x, triang.y)
+    w = dudy - dvdx
     w = w / np.max(np.abs(w))
+
+    # Magnitude comparison for each term in NS
+    Inert1 = np.multiply(u,dudx)
+    Inert2 = np.multiply(v,dudy)
+    print("Inert1 maxval = ", np.max(np.abs(Inert1))) 
+    print("Inert2 maxval = ", np.max(np.abs(Inert2)))
+
+
+    # Plot streamwise velocity profile at the inlet and exit
+    plt.figure(figsize=(8,4))
+    plt.plot(u[155:179],y[155:179])
+    plt.xlabel('u-velocity')
+    plt.ylabel('y')
+    plt.title('Outlet u-velocity profile, baseline1')
+    plt.savefig('OutletVelProf.png', dpi=300)
+    plt.close()
+    
 
     plt.figure(figsize=(8,4))
     plt.tripcolor(triang, w, shading='gouraud', cmap='jet')
