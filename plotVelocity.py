@@ -32,38 +32,42 @@ def main():
     triang.set_mask(np.hypot(xtri, ytri) < 1.0)
     ti_u = tri.LinearTriInterpolator(triang, u)
     ti_v = tri.LinearTriInterpolator(triang, v)
-    dudx , dudy = ti_u.gradient(triang.x, triang.y)
-    dvdx, dvdy  = ti_v.gradient(triang.x, triang.y)
-    w = dudy - dvdx
-    w = w / np.max(np.abs(w))
-
-    # Magnitude comparison for each term in NS
-    Inert1 = np.multiply(u,dudx)
-    Inert2 = np.multiply(v,dudy)
-    print("Inert1 maxval = ", np.max(np.abs(Inert1))) 
-    print("Inert2 maxval = ", np.max(np.abs(Inert2)))
-
-
-    # Plot streamwise velocity profile at the inlet and exit
+    ti_p = tri.LinearTriInterpolator(triang, p)
+    
+    # Create cartesian mesh
+    xcart = np.linspace(-8,8,num=2000)
+    ytop = 1.01*np.ones(xcart.shape)
+    ybot = -1.01*np.ones(xcart.shape)
+    ycent = np.zeros(xcart.shape)
+    
+    uVelTop = ti_u(xcart,ytop)
+    uVelBot = ti_u(xcart,ybot)
+    uVelCent = ti_u(xcart,ycent)
+    
+    vVelTop = ti_v(xcart,ytop)
+    vVelBot = ti_v(xcart,ybot)
+    vVelCent = ti_v(xcart,ycent)
+    
     plt.figure(figsize=(8,4))
-    plt.plot(u[155:179],y[155:179])
-    plt.xlabel('u-velocity')
-    plt.ylabel('y')
-    plt.title('Outlet u-velocity profile, baseline7')
-    plt.savefig('OutletVelProf.png', dpi=300)
-    plt.close() 
-
-    plt.figure(figsize=(8,4))
-    plt.tripcolor(triang, w, shading='gouraud', cmap='jet')
-    plt.colorbar()
-    plt.axis('image')
-    plt.ylim(-1.1,2)
-    plt.xlim(-8,8)
+    plt.plot(xcart,uVelTop)
+    plt.plot(xcart,uVelBot)
+    plt.plot(xcart,uVelCent)
     plt.xlabel('x')
-    plt.ylabel('y')
-    plt.title('vorticity')
-    plt.tight_layout()
-    plt.savefig('vorticity.png', dpi=300)
+    plt.ylabel('$u$-velocity')
+    plt.title('$u$-velocity profiles - Baseline7')
+    plt.legend(['Top of cylinder','Bottom of cylinder','Center line'])
+    plt.savefig('uVelProfiles.png', dpi=300)
+    plt.close()
+
+    plt.figure(figsize=(8,4))
+    plt.plot(xcart,vVelTop)
+    plt.plot(xcart,vVelBot)
+    plt.plot(xcart,vVelCent)
+    plt.xlabel('x')
+    plt.ylabel('$v$-velocity')
+    plt.title('$v$-velocity profiles - Baseline7')
+    plt.legend(['Top of cylinder','Bottom of cylinder','Center line'])
+    plt.savefig('vVelProfiles.png', dpi=300)
     plt.close()
     
     plt.figure(figsize=(8,4))
@@ -91,7 +95,4 @@ def main():
     plt.tight_layout()
     plt.savefig('uvelocity.png', dpi=300)
     plt.close()
-
-
-
 if __name__=='__main__': main()

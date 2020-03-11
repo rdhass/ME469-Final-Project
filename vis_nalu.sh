@@ -40,13 +40,3 @@ else
 	pip install netCDF4 --user
 fi
 
-# Run nalu
-echo "Post process nalu"
-if [ -f /home/users/ryanhass/ME469_FinalProject/datFiles/baseline1/viscousPump.e ]
-then
-	echo "Start to generate plot."
-	python3 $script
-	echo "Done!"
-else
-	echo "ERROR: viscousPump.e not found."
-fi
